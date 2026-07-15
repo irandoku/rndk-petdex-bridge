@@ -3,6 +3,10 @@
 [![Tests](https://github.com/irandoku/rndk-petdex-bridge/actions/workflows/test.yml/badge.svg)](https://github.com/irandoku/rndk-petdex-bridge/actions/workflows/test.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
+> One shared Petdex Desktop mascot for Hermes, Claude Code, and Codex.
+
+<img src="assets/readme/hero.svg" alt="Hermes, Claude Code, and Codex sending lifecycle signals through rndk-petdex-bridge to one shared Petdex Desktop mascot" width="1200" />
+
 A small, unofficial [Hermes Agent](https://github.com/NousResearch/hermes-agent) plugin that forwards Hermes lifecycle events to one shared [Petdex Desktop](https://github.com/crafter-station/petdex) mascot.
 
 The goal is one external desktop pet that can react to multiple agents such as Claude Code, Codex, and Hermes. This repository does **not** patch or fork either upstream project.
