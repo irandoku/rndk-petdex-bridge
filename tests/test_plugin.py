@@ -35,10 +35,15 @@ class FakeContext:
 class StubBridge:
     def __init__(self, succeed: bool = True) -> None:
         self.calls: list[tuple[str, int | None]] = []
+        self.bubbles: list[str] = []
         self.succeed = succeed
 
     def send_state(self, state: str, duration: int | None = None) -> bool:
         self.calls.append((state, duration))
+        return self.succeed
+
+    def send_bubble(self, text: str) -> bool:
+        self.bubbles.append(text)
         return self.succeed
 
     def diagnose(self) -> dict[str, object]:
@@ -72,6 +77,7 @@ def test_registers_only_bridge_hooks_and_namespaced_command() -> None:
     plugin.register(context)
 
     assert set(context.hooks) == {
+        "on_session_start",
         "pre_tool_call",
         "post_tool_call",
         "on_session_end",
@@ -87,15 +93,23 @@ def test_hooks_map_hermes_lifecycle_to_petdex_states() -> None:
     context = FakeContext()
     plugin.register(context)
 
-    context.hooks["pre_tool_call"](tool_name="terminal", args={})
-    context.hooks["post_tool_call"](tool_name="terminal", args={}, result="ok")
+    context.hooks["on_session_start"](session_id="session-1")
+    context.hooks["pre_tool_call"](tool_name="read_file", args={"path": "/tmp/README.md"})
+    context.hooks["post_tool_call"](
+        tool_name="read_file",
+        args={"path": "/tmp/README.md"},
+        result="ok",
+        status="ok",
+    )
     context.hooks["on_session_end"](session_id="session-1")
 
     assert stub.calls == [
-        ("running", None),
+        ("jumping", 800),
+        ("review", None),
         ("idle", None),
         ("waving", 1600),
     ]
+    assert stub.bubbles == ["Thinking…", "Reading README.md", "Read README.md", "Done."]
 
 
 def test_status_command_returns_diagnostics_without_token_value() -> None:

@@ -11,7 +11,7 @@ from urllib.request import Request, urlopen
 AGENT_SOURCE = "rndk-hermes"
 DEFAULT_BASE_URL = "http://127.0.0.1:7777"
 TOKEN_HEADER = "X-Petdex-Update-Token"
-SUPPORTED_STATES = frozenset({"idle", "running", "waving"})
+SUPPORTED_STATES = frozenset({"idle", "running", "waving", "jumping", "failed", "review", "waiting"})
 
 
 class PetdexBridge:
@@ -88,6 +88,19 @@ class PetdexBridge:
                 "duration": duration,
                 "agent_source": AGENT_SOURCE,
             },
+        )
+        return result is not None and result.get("ok") is True
+
+    def send_bubble(self, text: str) -> bool:
+        if not isinstance(text, str) or not text.strip():
+            raise ValueError("text must be a non-empty string")
+        if not self.hooks_enabled:
+            return False
+
+        result = self._request(
+            "/bubble",
+            method="POST",
+            payload={"text": text[:200], "agent_source": AGENT_SOURCE},
         )
         return result is not None and result.get("ok") is True
 

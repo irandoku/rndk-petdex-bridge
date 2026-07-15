@@ -1,6 +1,6 @@
 [project]
 name = "rndk-petdex-bridge"
-version = "0.1.1"
+version = "0.2.0"
 description = "Bridge Hermes Agent lifecycle events to one shared Petdex Desktop mascot."
 readme = "README.md"
 requires-python = ">=3.9"

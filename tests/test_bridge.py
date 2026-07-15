@@ -51,6 +51,9 @@ class _SidecarHandler(BaseHTTPRequestHandler):
         if self.path == "/state":
             self.state = payload
             self._json(self.post_response)
+        elif self.path == "/bubble":
+            self.bubble = payload
+            self._json(self.post_response)
         else:
             self._json({"error": "not found"}, 404)
 
@@ -59,6 +62,7 @@ class _SidecarHandler(BaseHTTPRequestHandler):
 def _sidecar():
     _SidecarHandler.requests = []
     _SidecarHandler.state = {"state": "idle", "duration": None}
+    _SidecarHandler.bubble = {"text": "", "agent_source": None}
     _SidecarHandler.post_response = {"ok": True}
     server = ThreadingHTTPServer(("127.0.0.1", 0), _SidecarHandler)
     thread = threading.Thread(target=server.serve_forever, daemon=True)
@@ -99,6 +103,22 @@ def test_send_state_posts_token_duration_and_agent_source(tmp_path: Path) -> Non
         ]
 
 
+def test_send_bubble_posts_text_and_agent_source(tmp_path: Path) -> None:
+    _write_token(tmp_path)
+    with _sidecar() as (url, handler):
+        bridge = PetdexBridge(petdex_home=tmp_path, base_url=url)
+
+        assert bridge.send_bubble("Thinking…") is True
+
+        assert handler.requests == [
+            {
+                "path": "/bubble",
+                "token": "test-token",
+                "payload": {"text": "Thinking…", "agent_source": AGENT_SOURCE},
+            }
+        ]
+
+
 def test_kill_switch_prevents_network_call(tmp_path: Path) -> None:
     _write_token(tmp_path)
     (tmp_path / "runtime" / "hooks-disabled").touch()
@@ -106,6 +126,7 @@ def test_kill_switch_prevents_network_call(tmp_path: Path) -> None:
         bridge = PetdexBridge(petdex_home=tmp_path, base_url=url)
 
         assert bridge.send_state("idle") is False
+        assert bridge.send_bubble("Thinking…") is False
         assert handler.requests == []
 
 
@@ -114,6 +135,7 @@ def test_missing_token_prevents_network_call(tmp_path: Path) -> None:
         bridge = PetdexBridge(petdex_home=tmp_path, base_url=url)
 
         assert bridge.send_state("idle") is False
+        assert bridge.send_bubble("Thinking…") is False
         assert handler.requests == []
 
 

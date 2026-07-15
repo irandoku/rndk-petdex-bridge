@@ -1,10 +1,11 @@
 manifest_version: 1
 name: rndk-petdex-bridge
-version: 0.1.1
+version: 0.2.0
 description: Bridge Hermes Agent lifecycle events to one shared Petdex Desktop mascot.
 author: irandoku
 homepage: https://github.com/irandoku/rndk-petdex-bridge
 provides_hooks:
+  - on_session_start
   - pre_tool_call
   - post_tool_call
   - on_session_end
