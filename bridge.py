@@ -89,7 +89,7 @@ class PetdexBridge:
                 "agent_source": AGENT_SOURCE,
             },
         )
-        return result is not None
+        return result is not None and result.get("ok") is True
 
     def diagnose(self) -> Dict[str, Any]:
         health = self._request("/health")

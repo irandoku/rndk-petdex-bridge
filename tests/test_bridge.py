@@ -15,6 +15,7 @@ class _SidecarHandler(BaseHTTPRequestHandler):
     requests: list[dict[str, object]] = []
     state = {"state": "idle", "duration": None}
     bubble = {"text": "", "agent_source": None}
+    post_response = {"ok": True}
 
     def log_message(self, format: str, *args: object) -> None:
         return
@@ -49,7 +50,7 @@ class _SidecarHandler(BaseHTTPRequestHandler):
         )
         if self.path == "/state":
             self.state = payload
-            self._json({"ok": True})
+            self._json(self.post_response)
         else:
             self._json({"error": "not found"}, 404)
 
@@ -58,6 +59,7 @@ class _SidecarHandler(BaseHTTPRequestHandler):
 def _sidecar():
     _SidecarHandler.requests = []
     _SidecarHandler.state = {"state": "idle", "duration": None}
+    _SidecarHandler.post_response = {"ok": True}
     server = ThreadingHTTPServer(("127.0.0.1", 0), _SidecarHandler)
     thread = threading.Thread(target=server.serve_forever, daemon=True)
     thread.start()
@@ -148,3 +150,12 @@ def test_unreachable_sidecar_fails_open(tmp_path: Path) -> None:
 
     assert bridge.send_state("running") is False
     assert bridge.diagnose()["sidecar"] == "unreachable"
+
+
+def test_2xx_error_body_is_not_reported_as_success(tmp_path: Path) -> None:
+    _write_token(tmp_path)
+    with _sidecar() as (url, handler):
+        handler.post_response = {"error": "rejected"}
+        bridge = PetdexBridge(petdex_home=tmp_path, base_url=url)
+
+        assert bridge.send_state("idle") is False
