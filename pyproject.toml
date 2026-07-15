@@ -1,0 +1,12 @@
+[project]
+name = "rndk-petdex-bridge"
+version = "0.1.0"
+description = "Bridge Hermes Agent lifecycle events to one shared Petdex Desktop mascot."
+readme = "README.md"
+requires-python = ">=3.9"
+license = "MIT"
+authors = [{ name = "irandoku" }]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
