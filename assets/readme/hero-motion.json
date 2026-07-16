@@ -1,0 +1,21 @@
+{
+  "width": 1200,
+  "fps": 24,
+  "duration": 5.0,
+  "colors": 128,
+  "dither": "none",
+  "clip_to_base_alpha": true,
+  "max_size_mb": 2.0,
+  "layers": [
+    {
+      "id": "signal-strip",
+      "enter": {"start": 0.25, "end": 0.95, "from": [0, 16]},
+      "exit": {"start": 4.25, "end": 4.96, "to": [0, 12]}
+    },
+    {
+      "id": "shared-mascot",
+      "enter": {"start": 0.65, "end": 1.3, "from": [0, 18]},
+      "exit": {"start": 4.25, "end": 4.96, "to": [0, 12]}
+    }
+  ]
+}

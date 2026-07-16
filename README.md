@@ -5,7 +5,12 @@
 
 > One shared Petdex Desktop mascot for Hermes, Claude Code, and Codex.
 
-<img src="assets/readme/hero.svg" alt="Hermes, Claude Code, and Codex sending lifecycle signals through rndk-petdex-bridge to one shared Petdex Desktop mascot" width="1200" />
+<picture>
+  <source media="(prefers-reduced-motion: reduce)" srcset="assets/readme/hero.svg" />
+  <img src="assets/readme/hero.gif" alt="Hermes, Claude Code, and Codex sending lifecycle signals through rndk-petdex-bridge to one shared Petdex Desktop mascot" width="1200" />
+</picture>
+
+Static SVG fallback: [`assets/readme/hero.svg`](assets/readme/hero.svg) · Motion spec: [`assets/readme/hero-motion.json`](assets/readme/hero-motion.json)
 
 A small, unofficial [Hermes Agent](https://github.com/NousResearch/hermes-agent) plugin that forwards Hermes lifecycle events to one shared [Petdex Desktop](https://github.com/crafter-station/petdex) mascot.
 
@@ -37,13 +42,16 @@ flowchart LR
     X[Codex hooks] --> S
 ```
 
-The plugin sends:
+The bridge turns real agent lifecycle hooks into short Petdex signals:
 
 | Hermes event | Petdex state |
 | --- | --- |
-| `pre_tool_call` | `running` |
-| `post_tool_call` | `idle` |
-| `on_session_end` | `waving` for 1.6 seconds |
+| `on_session_start` | `jumping` for 0.8 seconds + `Thinking…` bubble |
+| `pre_tool_call` | `running`, or `review` for read-only inspection tools |
+| `post_tool_call` | `idle`, or `failed` for an unsuccessful tool call |
+| `on_session_end` | `waving` for 1.6 seconds + `Done.` bubble |
+
+Tool lifecycle messages use the sidecar's `/bubble` endpoint, clipped to 200 characters. Every state and bubble carries `agent_source: rndk-hermes`, keeping this bridge separate from Hermes' built-in Petdex integration.
 
 ## Requirements
 
